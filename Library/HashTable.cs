@@ -27,7 +27,7 @@ namespace Library
                 {
                     if(array[i].Key != null && array[i].Value != null)
                     {
-                        int newIndex = Hash(key, newArray.Length);
+                        int newIndex = Hash(array[i].Key, newArray.Length);
                         newArray[newIndex] = array[i];
                     }
                 }
@@ -40,6 +40,7 @@ namespace Library
             {
                 int index = Hash(key, array.Length);
                 array[index] = new KeyValuePair<Key, Value>(key, value);
+                CalculateLoadFactor();
             }
         }
 
@@ -47,7 +48,7 @@ namespace Library
         {
             foreach(KeyValuePair<Key, Value> item in array)
             {
-                if(item.Key.Equals(key))
+                if(item.Key != null && item.Key.Equals(key))
                 {
                     return item;
                 }
