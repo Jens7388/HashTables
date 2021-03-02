@@ -43,8 +43,15 @@ namespace Library
             }
         }
 
-        public Value LookUp(Key key)
+        public KeyValuePair<Key, Value> LookUp(Key key)
         {
+            foreach(KeyValuePair<Key, Value> item in array)
+            {
+                if(item.Key.Equals(key))
+                {
+                    return item;
+                }
+            }
             return default;
         }
 
