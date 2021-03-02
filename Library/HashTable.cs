@@ -9,12 +9,16 @@ namespace Library
         protected readonly double increaseSizeFactor = 1.5;
         protected double actualLoadFactor;
         protected int elements;
-        protected KeyValuePair<Key, Value>[] array;
+        protected LinkedList<KeyValuePair<Key, Value>>[] array;
         protected bool loadFactorThresholdReached; 
 
         public HashTable(int initialSize)
         {
-            array = new KeyValuePair<Key, Value>[initialSize];
+            array = new LinkedList<KeyValuePair<Key, Value>>[initialSize];
+            for(int i = 0; i < array.Length - 1; i++)
+            {
+                 array[i] = new();
+            }          
         }
 
 
@@ -22,35 +26,44 @@ namespace Library
         {
             if(loadFactorThresholdReached)
             {
-                KeyValuePair<Key, Value>[] newArray = new KeyValuePair<Key, Value>[(int)(array.Length * increaseSizeFactor)];
+                LinkedList<KeyValuePair<Key, Value>>[] newArray = new LinkedList<KeyValuePair<Key, Value>>[(int)(array.Length * increaseSizeFactor)];
                 for(int i = 0; i < array.Length -1; i++)
                 {
-                    if(array[i].Key != null && array[i].Value != null)
+                    if(array[i].Count > 0)
                     {
-                        int newIndex = Hash(array[i].Key, newArray.Length);
-                        newArray[newIndex] = array[i];
+                        foreach(KeyValuePair<Key, Value> item in array[i])
+                        {
+                            int newIndex = Hash(item.Key, newArray.Length);
+                            newArray[newIndex].AddLast(item);
+                        }
                     }
                 }
                 array = newArray;
                 CalculateLoadFactor();
                 int index = Hash(key, array.Length);
-                array[index] = new KeyValuePair<Key, Value>( key, value);
+                array[index].AddLast(new KeyValuePair<Key, Value>( key, value));
             }
             else
             {
                 int index = Hash(key, array.Length);
-                array[index] = new KeyValuePair<Key, Value>(key, value);
+                array[index].AddLast(new KeyValuePair<Key, Value>(key, value));
                 CalculateLoadFactor();
             }
         }
 
         public KeyValuePair<Key, Value> LookUp(Key key)
         {
-            foreach(KeyValuePair<Key, Value> item in array)
+            foreach(LinkedList<KeyValuePair<Key, Value>> list in array)
             {
-                if(item.Key != null && item.Key.Equals(key))
+                if(list.Count > 0)
                 {
-                    return item;
+                    foreach(KeyValuePair<Key, Value> item in list)
+                    {
+                        if(item.Key.Equals(key))
+                        {
+                            return item;
+                        }
+                    }
                 }
             }
             return default;
@@ -59,9 +72,9 @@ namespace Library
         private void CalculateLoadFactor()
         {
             actualLoadFactor = 0;
-            foreach(KeyValuePair<Key, Value> item in array)
+            foreach(LinkedList<KeyValuePair<Key, Value>> item in array)
             {
-                if(item.Key != null && item.Value != null)
+                if(item.Count >= 0)
                 {
                     actualLoadFactor++;
                 }
