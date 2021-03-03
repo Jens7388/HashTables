@@ -1,33 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Library
 {
-    public class HashTable<Key, Value>
+    public class ListHashTable<Key, Value> : HashTable<Key, Value>
     {
-        protected readonly double loadFactor = 0.8;
-        protected readonly double increaseSizeFactor = 1.5;
-        protected double actualLoadFactor;
-        protected int elements;
-        protected BucketEntry<Key, Value>[] array;
-        protected bool loadFactorThresholdReached; 
-
-        public HashTable(int initialSize)
+        public ListHashTable(int initialSize) : base(initialSize)
         {
             array = new BucketEntry<Key, Value>[initialSize];
-            for(int i = 0; i < array.Length - 1; i++)
+            for(int i = 0; i < array.Length; i++)
             {
-                 array[i] = new();
-            }          
+                array[i] = new();
+            }
         }
 
-
-        public void Add(Key key, Value value)
+        public override void Add(Key key, Value value)
         {
             if(loadFactorThresholdReached)
             {
                 BucketEntry<Key, Value>[] newArray = new BucketEntry<Key, Value>[(int)(array.Length * increaseSizeFactor)];
-                for(int i = 0; i < array.Length -1; i++)
+                for(int i = 0; i < array.Length - 1; i++)
                 {
                     if(array[i].Head.Key != null && array[i].Head.Value != null)
                     {
@@ -46,7 +41,7 @@ namespace Library
                 array = newArray;
                 CalculateLoadFactor();
                 int index = Hash(key, array.Length);
-                array[index].Add(new KeyValuePair<Key, Value>( key, value));
+                array[index].Add(new KeyValuePair<Key, Value>(key, value));
             }
             else
             {
@@ -56,7 +51,7 @@ namespace Library
             }
         }
 
-        public KeyValuePair<Key, Value> LookUp(Key key)
+        public override KeyValuePair<Key, Value> LookUp(Key key)
         {
             foreach(BucketEntry<Key, Value> item in array)
             {
@@ -78,7 +73,7 @@ namespace Library
             return default;
         }
 
-        private void CalculateLoadFactor()
+        public override void CalculateLoadFactor()
         {
             actualLoadFactor = 0;
             foreach(BucketEntry<Key, Value> item in array)
@@ -97,16 +92,6 @@ namespace Library
             {
                 loadFactorThresholdReached = false;
             }
-        }
-
-        private int Hash(Key key, int arrayLength)
-        {
-            int hashCode = key.GetHashCode();
-            int mask = hashCode >> 31;
-            hashCode ^= mask;
-            hashCode -= mask;
-            hashCode %= arrayLength;
-            return hashCode;
         }
     }
 }

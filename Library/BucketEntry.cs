@@ -44,7 +44,7 @@ namespace Library
 
         public virtual void Add(KeyValuePair<Key, Value> item)
         {
-            if(Head.Key == null && Head.Value == null)
+            if(Head.Key == null || Head.Value == null)
             {
                 Head = item;
             }
